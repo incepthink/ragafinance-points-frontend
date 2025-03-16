@@ -1,103 +1,127 @@
+"use client";
+
+import Navbar from "@/components/Navbar";
+import { fetchDeposits } from "@/utils/dataFetch";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+const formatAddress = (address: string) => {
+  return address.slice(0, 6).concat("...", address.slice(-4));
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [deposits, setDeposits] = useState({
+    deposits: [],
+    points: [],
+    totalValueDeposited: 0,
+    totalPointsEarned: 0,
+  });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const getData = async () => {
+    const deposits = await fetchDeposits(
+      "0x2FF0c59B5768E53bCE1077569cDe9811940e3eBD"
+    );
+    setDeposits(deposits);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  return (
+    <div className="flex flex-col h-screen overflow-hidden">
+      <Navbar />
+      <div className=" relative flex-grow">
+        <div className="rounded-md overflow-hidden absolute top-2 bottom-2 right-2 left-2 -z-50">
+          <img
+            src="/background.jpg"
+            alt="background"
+            className="object-cover w-full h-full"
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="grid grid-cols-3 p-8 gap-8">
+          <div className="bg-[#FECB77] p-4 rounded-sm">
+            <p className="text-2xl font-semibold mb-4">Recent Deposits</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Token Address</TableHead>
+                  <TableHead className="text-right">Amount (ETH)</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {deposits.deposits.map((deposit: any) => {
+                  return (
+                    <TableRow>
+                      <TableCell className="font-medium">
+                        {formatAddress(deposit.token_address)}
+                      </TableCell>{" "}
+                      <TableCell className="font-medium text-right">
+                        {deposit.asset_deposited_value_eth}
+                      </TableCell>{" "}
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="bg-[#FECB77] p-4 rounded-sm flex flex-col">
+            <p className="text-2xl font-semibold mb-4">
+              Total Amount Deposited
+            </p>
+            <div className="mt-2">
+              <p className="text-3xl opacity-80">
+                {deposits.totalValueDeposited} ETH
+              </p>
+            </div>
+            <p className="text-2xl font-semibold mb-4 mt-8">
+              Total Points Earned
+            </p>
+            <div className="mt-2">
+              <p className="text-3xl opacity-80">
+                {deposits.totalPointsEarned.toFixed(2)} points
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-[#FECB77] p-4 rounded-sm flex flex-col">
+            <p className="text-2xl font-semibold mb-4">Points Earned</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Token Address</TableHead>
+                  <TableHead className="text-right">Points</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {deposits.points.map((point: any) => {
+                  return (
+                    <TableRow>
+                      <TableCell className="font-medium">
+                        {formatAddress(point.token_address)}
+                      </TableCell>{" "}
+                      <TableCell className="font-medium text-right">
+                        {point.points}
+                      </TableCell>{" "}
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
