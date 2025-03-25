@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { Button } from "../ui/button";
 import axios from "axios";
-import { BackendUrl, testAddress } from "@/utils/constants";
+import { BackendUrl, clientAxios, testAddress } from "@/utils/constants";
 import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,7 +17,7 @@ const ReferModal = ({ closeModal }: any) => {
       alert("connect wallet and enter code");
       return;
     }
-    const res = await axios.post(`${BackendUrl}/user/refer`, {
+    const res = await clientAxios.post(`${BackendUrl}/user/refer`, {
       referrerAddress: testAddress,
       refereeCode: inputRef.current!.value,
     });

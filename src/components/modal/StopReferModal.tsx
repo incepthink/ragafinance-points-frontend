@@ -1,14 +1,14 @@
 import { formatAddress } from "@/app/page";
 import { Button } from "../ui/button";
 import axios from "axios";
-import { BackendUrl } from "@/utils/constants";
+import { BackendUrl, clientAxios } from "@/utils/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
 const StopReferModal = ({ closeModal, userAddress, referralAddress }: any) => {
   const queryClient = useQueryClient();
 
   const handleClick = async () => {
-    const res = await axios.delete(`${BackendUrl}/user/refer`, {
+    const res = await clientAxios.delete(`${BackendUrl}/user/refer`, {
       data: { address: userAddress },
     });
     console.log(res);
